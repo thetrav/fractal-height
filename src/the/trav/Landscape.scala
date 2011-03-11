@@ -5,16 +5,17 @@ import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener}
 import java.awt.{Color, BorderLayout, Graphics2D, Graphics}
 
-case class Coord(x:Int, y:Int)
-case class Range(min:Int, max:Int)
 
 object Landscape {
 
   var doPaint = (g:Graphics2D) => {}
+  val width = 1024
+  val height = 768
 
   def main(args: Array[String]) {
+
     val frame = new JFrame("fractal line")
-    frame.setSize(800,600)
+    frame.setSize(width, height)
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
 
@@ -41,10 +42,12 @@ object Landscape {
 
     val control = addField(_:String, _:String, controls)
 
-    val clampField = control("clamp", "400")
+    val startPointsField = control("startPoints", "4")
+    val clampField = control("clamp", "" + (height/2))
     val iterationField = control("iterations", "5")
-    val roughnessField = control("roughness", "0.5")
+    val roughnessField = control("roughness", "0.3")
     val scaleField = control("scale", "1")
+
 
     def asInt(field:JTextField) = {
       BigDecimal(field.getText()).toInt
@@ -55,7 +58,9 @@ object Landscape {
     }
 
     def updateLine = () => {
-      val line = FractalLine(asInt(iterationField),
+      val line = FractalLine(
+        asInt(startPointsField),
+        asInt(iterationField),
         asFloat(roughnessField),
         asInt(clampField),
         asInt(scaleField))
@@ -78,9 +83,10 @@ object Landscape {
   def drawLine(g:Graphics2D, points:List[Int]) {
     val originalTransform = g.getTransform()
     g.setColor(Color.white)
-    g.fillRect(0,0,800,600)
+    g.fillRect(0,0,width,height)
     g.setColor(Color.red)
-    val xInterval = 600/points.length
+    g.translate(0, height/2)
+    val xInterval = width/points.length
     points.sliding(2).foreach((window:List[Int]) => {
       g.drawLine(0, window(0), xInterval, window(1))
       g.translate(xInterval, 0)
@@ -90,10 +96,9 @@ object Landscape {
   }
 }
 
-case class FractalLine(iterations:Int, roughness:Float, clamp:Int, scale:Int) {
+case class FractalLine(startPoints:Int, iterations:Int, roughness:Float, clamp:Int, scale:Int) {
   val random = new Random("Travis Dixon".hashCode()+scale)
-  val startList = List(random.nextInt(clamp),
-                         random.nextInt(clamp))
+  val startList = for(n <- 1 to startPoints) yield random.nextInt(clamp)
 //  println("iterations="+iterations)
   private def splitList(list:List[Int], splitClamp:Int) = {
     def displace(a:Int, b:Int) = {
@@ -116,6 +121,6 @@ case class FractalLine(iterations:Int, roughness:Float, clamp:Int, scale:Int) {
     splitList(l, splitClamp)
   }
 
-  def list = (1 to iterations).foldLeft[List[Int]](startList)(splitIteration).toList
+  def list = (1 to iterations).foldLeft[List[Int]](startList.toList)(splitIteration).toList
 
 }
