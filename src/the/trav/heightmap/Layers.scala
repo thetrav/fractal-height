@@ -11,8 +11,8 @@ trait Layer[T] {
     val target = d match {
       case North => c + Coord[T](numeric.zero, numeric.negate(scale))
       case South => c + Coord[T](numeric.zero, scale)
-      case East  => c + Coord[T](numeric.zero, scale)
-      case West  => c + Coord[T](numeric.zero, numeric.negate(scale))
+      case East  => c + Coord[T](scale, numeric.zero)
+      case West  => c + Coord[T](numeric.negate(scale), numeric.zero)
     }
     if(points.contains(target)) Some(target) else None
   }

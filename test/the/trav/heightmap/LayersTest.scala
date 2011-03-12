@@ -1,9 +1,9 @@
 package the.trav.heightmap
 
 import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.matchers.MustMatchers
 
-
-class LayersTest extends FeatureSpec with GivenWhenThen {
+class LayersTest extends FeatureSpec with GivenWhenThen with MustMatchers {
  def ninePoints = Map(Coord(0,0) -> 1, Coord(1,0)->2, Coord(2,0)->3,
                       Coord(0,1) -> 4, Coord(1,1)->5, Coord(2,1)->6,
                       Coord(0,2) -> 7, Coord(1,2)->8, Coord(2,2)->9)
@@ -22,7 +22,8 @@ class LayersTest extends FeatureSpec with GivenWhenThen {
      then("we should be given the correct coord which is Some(1,0)")
      assert(neighbor == Some(Coord(1,0)))
       and("we the point for that neighbor should be 2")
-      assert(layer.point(neighbor.get) == Some(2))
+     val neighborPoint = layer.point(neighbor.get)
+      neighborPoint must be === Some(2)
    }
     //given a single 3x3 layer of points ({1,2,3},{4,5,6},{7,8,9})
     // and we have the north western point (1)
