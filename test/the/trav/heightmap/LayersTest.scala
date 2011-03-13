@@ -1,6 +1,5 @@
 package the.trav.heightmap
 
-import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.matchers.MustMatchers
 
 object LayersTest {
@@ -14,14 +13,69 @@ class LayersTest extends MustMatchers {
                       Coord(0,1) -> 4, Coord(1,1)->5, Coord(2,1)->6,
                       Coord(0,2) -> 7, Coord(1,2)->8, Coord(2,2)->9)
 
- //top left
- val neighbors = Map[Direction, Option[(Coord[Int], Int)]](North -> None, East -> Some(Coord(1,0), 2), South-> Some(Coord(0,1), 4), West -> None)
- def run() {
-
-   val coord = Coord(0,0)
+  def run() {
+   println("testing single layer")
    val layer = SingleLayer(ninePoints, 1)
 
-   neighbors.keys.foreach((d:Direction) => {
+   println("testing north west corner")
+   testSingleLayer(layer, Coord(0,0), Map( North -> None,
+                                           East -> Some(Coord(1,0), 2), 
+                                           South-> Some(Coord(0,1), 4),
+                                           West -> None))
+
+   println("testing north edge")
+   testSingleLayer(layer, Coord(1,0), Map( North -> None,
+                                           East -> Some(Coord(2,0), 3),
+                                           South-> Some(Coord(1,1), 5),
+                                           West -> Some(Coord(0,0), 1)))
+
+   println("testing north east corner")
+   testSingleLayer(layer, Coord(2,0), Map( North -> None,
+                                           East -> None,
+                                           South-> Some(Coord(2,1), 6),
+                                           West -> Some(Coord(1,0), 2)))
+
+   println("testing west edge")
+   testSingleLayer(layer, Coord(0,1), Map( North -> Some(Coord(0,0), 1),
+                                           East -> Some(Coord(1,1), 5),
+                                           South-> Some(Coord(0,2), 7),
+                                           West -> None))
+
+   println("testing center")
+   testSingleLayer(layer, Coord(1,1), Map( North -> Some(Coord(1,0), 2),
+                                           East -> Some(Coord(2,1), 6),
+                                           South-> Some(Coord(1,2), 8),
+                                           West -> Some(Coord(0,1), 4)))
+
+   println("testing east edge")
+   testSingleLayer(layer, Coord(2,1), Map( North -> Some(Coord(2,0), 3),
+                                           East -> None,
+                                           South-> Some(Coord(2,2), 9),
+                                           West -> Some(Coord(1,1), 5)))
+
+   println("testing south west corner")
+   testSingleLayer(layer, Coord(0,2), Map( North -> Some(Coord(0,1), 4),
+                                           East -> Some(Coord(1,2), 8),
+                                           South-> None,
+                                           West -> None))
+
+   println("testing south edge")
+   testSingleLayer(layer, Coord(1,2), Map( North -> Some(Coord(1,1), 5),
+                                           East -> Some(Coord(2,2), 9),
+                                           South-> None,
+                                           West -> Some(Coord(0,2), 7)))
+
+
+   println("testing south east corner")
+   testSingleLayer(layer, Coord(2,2), Map( North -> Some(Coord(2,1), 6),
+                                           East -> None,
+                                           South-> None,
+                                           West -> Some(Coord(1,2), 8)))
+   println("all tests passed")
+ }
+
+  def testSingleLayer(layer:SingleLayer[Int], coord:Coord[Int], neighbors:Map[Direction, Option[(Coord[Int], Int)]]) {
+    neighbors.keys.foreach((d:Direction) => {
 
      val value = neighbors.apply(d)
      println(coord + " should have " + d + " neighbor of "+ value)
@@ -34,46 +88,7 @@ class LayersTest extends MustMatchers {
          layer.point(tuple._1).get must be === tuple._2
        }
      }
+      println("passed")
    })
- }
-
-// feature("A single layer should provide the correct neighbors") {
-//   info("As a programmer")
-//   info("I want to be able to navigate around a single layer")
-//   info("So I can build sliding windows for midpoint displacement")
-//
-//   scenario("top left corner east neighbor") {
-//     given("a single layer of points ({1,2,3},{4,5,6},{7,8,9})")
-//     val layer = SingleLayer[Int](ninePoints, 1)
-//      and("we have the north western point which is Coord(0,0)")
-//     val c = Coord(0,0)
-//     when("we ask for the east neighbor")
-//     val neighbor = layer.neighbor(c, East)
-//     then("we should be given the correct coord which is Some(Coord(1,0))")
-//     assert(neighbor == Some(Coord(1,0)))
-//      and("the point for that neighbor should be 2")
-//     val neighborPoint = layer.point(neighbor.get)
-//      neighborPoint must be === Some(2)
-//   }
-//
-//   scenario("top left corner south neighbor")
-//    given("a single 3x3 layer of points ({1,2,3},{4,5,6},{7,8,9})")
-//     and("we have the north west point which is Coord(0,0)")
-//    when("we ask for the south neighbor")
-//    then("we should be given the correct coord which is Some(Coord(0,1))")
-//     and("the point for that neighbor should be 4")
-//
-//   scenario("top left corner west neighbor")
-//    given("a single 3x3 layer of points ({1,2,3},{4,5,6},{7,8,9})")
-//     and("we have the north west point which is Coord(0,0)")
-//    when("we ask for the west neighbor")
-//    then("we should be given None")
-//
-//   scenario("top left corner north neighbor")
-//    given("a single 3x3 layer of points ({1,2,3},{4,5,6},{7,8,9})")
-//     and("we have the north west point which is Coord(0,0)")
-//    when("we ask for the north neighbor")
-//    then("we should be given None")
-//  }
-
+  }
 }
