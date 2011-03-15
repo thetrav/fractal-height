@@ -1,7 +1,12 @@
 package the.trav.heightmap
 
-import Numeric._
+case class Coord(x:Double, y:Double) {
+  def + (c:Coord) = Coord(x+c.x, y+c.y)
 
-case class Coord[T](x:T, y:T)(implicit numeric: Numeric[T]) {
-  def + (c:Coord[T]) = Coord[T](numeric.plus(x, c.x), numeric.plus(y, c.y))
+  def step(d:Direction, scale:Double) = d match {
+    case North => Coord(x, y-scale)
+    case East => Coord(x+scale, y)
+    case South => Coord(x, y+scale)
+    case West => Coord(x-scale, y)
+  }
 }
