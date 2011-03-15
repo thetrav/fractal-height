@@ -9,7 +9,7 @@ object Viewer {
   val height = 600
 
 
-  val heightMapIterations = 1
+  val heightMapIterations = 2
   val heightMapScale = 20.0
   val heightMapSquareSize = 3 * heightMapScale
   val heightMapClamp = 400.00
@@ -22,7 +22,7 @@ object Viewer {
       val normalised = 255/maxHeight * height
       val positive = if (normalised < 0) 0 else normalised.asInstanceOf[Int]
       g.setColor(new Color(positive, positive, positive))
-      val oval = new java.awt.geom.Ellipse2D.Double(c.x, c.y, 10.0, 10.0)
+      val oval = new java.awt.geom.Ellipse2D.Double(c.x, c.y, 3.0, 3.0)
       g.fill(oval)
     }
   }

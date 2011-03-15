@@ -1,6 +1,7 @@
 package the.trav.heightmap
 
 import java.util.Random
+import annotation.tailrec
 
 object MappedProgressive {
   def main(args:Array[String]) { println(produceHeightMap(1, 20.0, 400.0)) }
@@ -37,7 +38,9 @@ object MappedProgressive {
     points.sum / points.count((Double) => true)
   }
 
-  def fillDown(map:Map[Coord, Double], iterations:Int, scale:Double, clamp:Double, squareSize:Int) = {
+  @tailrec
+  def fillDown(map:Map[Coord, Double], iterations:Int, scale:Double, clamp:Double, squareSize:Int)
+    :Map[Coord, Double] = {
     //diamonds
     val withDiamonds = map ++ diamonds(map, iterations, scale, clamp, squareSize)
     //squares
@@ -56,7 +59,8 @@ object MappedProgressive {
       val midPoint = Coord(x(0)*scale, y(0)*scale + scale/2)
       midPoint -> avg(midPoint)
     }
-    withDiamonds ++ verticals ++ horizontals
+    val betterMap = withDiamonds ++ verticals ++ horizontals
+    if(iterations == 0) betterMap else fillDown(betterMap, iterations - 1, scale/2, clamp/2, squareSize)
   }
 
   def diamonds(map:Map[Coord, Double], iterations:Int, scale:Double, clamp:Double, squareSize:Int) = {
