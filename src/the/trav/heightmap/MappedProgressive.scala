@@ -19,20 +19,22 @@ object MappedProgressive {
     fillDown(topMap, iterations-1, topScale, clamp, 3)                           
   }
 
-  def squareNeighbors(c:Coord, s:(Coord,Direction) => Coord, squareSize:Int):List[Coord] = {
+  def squareNeighbors(c:Coord, s:(Coord,Direction) => Coord, max:Double) = {
     def step(d:Direction) = s(c, d)
-    c match {
-      case Coord(0, _)                    => List(step(North), step(East),  step(South))
-      case Coord(x, _) if x >= squareSize => List(step(North), step(South), step(West))
-      case Coord(_, 0)                    => List(step(West),  step(South), step(East))
-      case Coord(_, y) if y >= squareSize => List(step(West),  step(North), step(East))
-      case _                              => List(step(North), step(South), step(East),  step(West))
+    val result = c match {
+      case Coord(0, _)             => Set(step(North), step(East),  step(South))
+      case Coord(x, _) if x >= max => Set(step(North), step(South), step(West))
+      case Coord(_, 0)             => Set(step(West),  step(South), step(East))
+      case Coord(_, y) if y >= max => Set(step(West),  step(North), step(East))
+      case _                       => Set(step(North), step(South), step(East),  step(West))
     }
+
+    result
   }
 
-  def neighborAverage(coord:Coord, neighbors:Coord => List[Coord], point:Coord => Double) = {
+  def neighborAverage(coord:Coord, neighbors:Coord => Set[Coord], point:Coord => Double) = {
     val points = for(c <- neighbors(coord)) yield point(c)
-    points.sum / points.length
+    points.sum / points.count((Double) => true)
   }
 
   def fillDown(map:Map[Coord, Double], iterations:Int, scale:Double, clamp:Double, squareSize:Int) = {
@@ -40,7 +42,8 @@ object MappedProgressive {
     val withDiamonds = map ++ diamonds(map, iterations, scale, clamp, squareSize)
     //squares
     def step(c:Coord, d:Direction) = c.step(d, scale/2)
-    def avg(c:Coord) = neighborAverage(c, squareNeighbors(_, step, squareSize), withDiamonds(_))
+    val max = (squareSize-1)*scale
+    def avg(c:Coord) = neighborAverage(c, squareNeighbors(_, step, max), withDiamonds(_))
 
     val horizontals = for(x <- (0 to squareSize-1).sliding(2);
                           y <- (0 to squareSize-1).sliding(1)) yield {
