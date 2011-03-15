@@ -60,7 +60,7 @@ object MappedProgressive {
       midPoint -> avg(midPoint)
     }
     val betterMap = withDiamonds ++ verticals ++ horizontals
-    if(iterations == 0) betterMap else fillDown(betterMap, iterations - 1, scale/2, clamp/2, squareSize)
+    if(iterations == 0) betterMap else fillDown(betterMap, iterations - 1, scale/2, clamp/2, squareSize*2-1)
   }
 
   def diamonds(map:Map[Coord, Double], iterations:Int, scale:Double, clamp:Double, squareSize:Int) = {

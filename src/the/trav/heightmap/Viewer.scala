@@ -9,7 +9,7 @@ object Viewer {
   val height = 600
 
 
-  val heightMapIterations = 2
+  val heightMapIterations = 3
   val heightMapScale = 20.0
   val heightMapSquareSize = 3 * heightMapScale
   val heightMapClamp = 400.00
